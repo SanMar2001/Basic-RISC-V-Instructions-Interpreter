@@ -312,7 +312,7 @@ def analyzer(assembler_code):
                 for i, j in zip(range(0,6), range(20,25)):
                     bin_ins[j] = rd_bits[i]
                 #Asignacion opcode
-                opcode = opcode[2:]
+                opcode = bin(object.opcode)[2:]
                 while len(opcode) != 7:
                     opcode = "0" + opcode
                 opcode_bits = list(opcode)
