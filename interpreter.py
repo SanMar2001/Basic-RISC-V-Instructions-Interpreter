@@ -274,7 +274,7 @@ def analyzer(assembler_code):
                 instruction = f"{object.mem}\t{instruction_bin:X}\n"
                 file.write(instruction)
             #Decodificación si es tipo R
-            if type(object) == InstructionR:
+            elif type(object) == InstructionR:
                 bin_ins = [0]*32
                 #Asignacion del func7
                 func7 = object.func7[2:]
@@ -322,6 +322,10 @@ def analyzer(assembler_code):
                 instruction_bin = int("".join(bin_ins), 2)
                 instruction = f"{object.mem}\t{instruction_bin:X}\n"
                 file.write(instruction)
+            #Instrucciones tipo I
+            elif type(object) == InstructionI:
+                bin_ins = [0]*32
+                
 
 
     print(Program)
