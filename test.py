@@ -1,12 +1,13 @@
-def binario_a_lista(numero_binario):
-    lista_bits = []
-    # Iterar sobre cada bit del número binario
-    for i in range(6, -1, -1):  # Comenzar desde el bit más significativo hasta el menos significativo
-        bit = (numero_binario >> i) & 1  # Extraer el bit en la posición 'i'
-        lista_bits.append(bit)  # Agregar el bit a la lista
-    return lista_bits
 
+
+def bin_list(numero_binario):
+    opcode = bin(numero_binario)[2:]
+    while len(opcode) != 7:
+        opcode = "0" + opcode
+    return opcode
 # Ejemplo de uso
 numero_binario = 0b0010011
-lista_bits = binario_a_lista(numero_binario)
-print(lista_bits)
+x = bin_list(numero_binario)
+bin_opcode = list(x)
+bin_trans = int(''.join(bin_opcode), 2)
+print(f"numero en binario {bin_trans:b} y en hexadecimal {bin_trans:X} y como entero {bin_trans}")
