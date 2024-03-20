@@ -85,10 +85,12 @@ def pseudo_translate(assembler_code):
                     Program.append((new_ins, memory))
                     Labels[len(Labels)-1].instructions.append(obj_ins)
                     memory += 4
+            #Verifica si es una instrucción común sin pseudo assembler
             elif re.match(ins_patt, line):
                 inst = re.match(ins_patt, line)
                 inst_name = inst.group(2)
                 inst_details = inst.group(4)
+                #Verifica si es tipo R
                 if inst_name in r_list:
                     param_patt = r'(\w+)(\s*)(\,)(\s*)(\w+)(\s*)(\,)(\s*)(\w+)($)'
                     params = re.match(param_patt, inst_details)
@@ -110,6 +112,7 @@ def pseudo_translate(assembler_code):
                         Program.append((new_ins, memory))
                         Labels[len(Labels)-1].instructions.append(obj_ins)
                         memory += 4
+                #Verifica si es tipo I de la forma rd, rs1, imm
                 elif inst_name in i_list[0]:
                     param_patt = r'(\w+)(\s*\,\s*)(\w+)(\s*\,\s*)(\-?\d+)($)'
                     params = re.match(param_patt, inst_details)
@@ -128,6 +131,7 @@ def pseudo_translate(assembler_code):
                         Program.append((new_ins, memory))
                         Labels[len(Labels)-1].instructions.append(obj_ins)
                         memory += 4
+                #Verifica si es tipo I de la forma rd,imm(rs1)
                 elif inst_name in i_list[1]:
                     param_patt = r'(\w+)(\s*\,\s*)(\-?\d+)(\s*\(\s*)(\w+)(\s*\))($)'
                     params = re.match(param_patt, inst_details)
@@ -145,6 +149,7 @@ def pseudo_translate(assembler_code):
                     Program.append((new_ins, memory))
                     Labels[len(Labels)-1].instructions.append(obj_ins)
                     memory += 4
+                #Verifica si es tipo S
                 elif inst_name in s_list:
                     param_patt = r'(\w+)(\s*\,\s*)(\-?\d+)(\s*\(\s*)(\w+)(\s*\))($)'
                     params = re.match(param_patt, inst_details)
@@ -162,10 +167,53 @@ def pseudo_translate(assembler_code):
                     Program.append((new_ins, memory))
                     Labels[len(Labels)-1].instructions.append(obj_ins)
                     memory += 4
+                #Verifica si es tipo U
+                elif inst_name in u_list:
+                    param_patt = r'(\w+)(\s*\,\s*)(\-?\d+)(\s*)($)'
+                    params = re.match(param_patt, inst_details)
+                    for i in range(32):
+                        if params.group(1) in regs[i]:
+                            rd_inst = i
+                            break
+                    imm_inst = int(params.group(3))
+                    new_ins = f"{inst_name} {rd_inst},{imm_inst}\n"
+                    obj_ins = InstructionU(inst_name, rd_inst, imm_inst, memory)
+                    Program.append((new_ins, memory))
+                    Labels[len(Labels)-1].instructions.append(obj_ins)
+                    memory += 4
+                #Verifica si es tipo J
+                elif inst_name in j_list:
+                    param_patt = r'(\w+)(\s*\,\s*)(\d+)(\s*)($)'
+                    params = re.match(param_patt, inst_details)
+                    for i in range(32):
+                        if params.group(1) in regs[i]:
+                            rd_inst = i
+                            break
+                    imm_inst = int(params.group(3))
+                    new_ins = f"{inst_name} {rd_inst},{imm_inst}\n"
+                    obj_ins = InstructionJ(inst_name, rd_inst, imm_inst, memory)
+                    Program.append((new_ins, memory))
+                    Labels[len(Labels)-1].instructions.append(obj_ins)
+                    memory += 4
+                #Verifica si es tipo B
+                elif inst_name in b_list:
+                    param_patt = r'(\w+)(\s*\,\s*)(\w+)(\s*\,\s*)(\d+)($)'
+                    params = re.match(param_patt, inst_details)
+                    for i in range(32):
+                        if params.group(1) in regs[i]:
+                            rs1_inst = i
+                            break
+                    for j in range(32):
+                        if params.group(3) in regs[j]:
+                            rs2_inst = j
+                            break
+                    imm_inst = int(params.group(5))
+                    new_ins = f"{inst_name} {rs1_inst},{rs2_inst},{imm_inst}\n"
+                    obj_ins = InstructionB(inst_name, rs1_inst, rs2_inst, imm_inst, memory)
+                    Program.append((new_ins, memory))
+                    Labels[len(Labels)-1].instructions.append(obj_ins)
+                    memory += 4
 
-
-
-                        
 
 ##'''
 def analyzer(assembler_code):

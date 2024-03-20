@@ -107,8 +107,8 @@ class InstructionU:
 class InstructionJ:
     
     def __init__(self, name, rd, imm, mem):
-        self.opcode = 0b1101111
         self.name = name
+        self.opcode = 0b1101111
         self.rd = bin(rd)
         self.imm = bin(imm)
         self.mem = hex(mem)
