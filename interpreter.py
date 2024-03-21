@@ -233,19 +233,173 @@ def analyzer(assembler_code):
                 bin_ins = [0]*32
                 #Asignación del opcode
                 opcode = bin(object.opcode)[2:]
+                while len(opcode) != 7 and len(opcode) < 8:
+                    opcode = "0" + opcode  
+                opcode_bits = list(opcode)
+                for i, j in zip(range(0,7), range(25,32)):
+                    bin_ins[j] = opcode_bits[i]
+                #Asignacion del inmediato
+                imm = object.imm
+                if imm.startswith("-"):
+                    imm = imm[3:]
+                    while len(imm) != 12 and len(imm) < 13:
+                        imm = "0" + imm
+                    imm = "-" + imm
+                else:
+                    imm = imm[2:]
+                    while len(imm) != 12 and len(imm) < 13:
+                        imm = "0" + imm
+                imm_bits = list(imm)
+                for m in range(0,7):
+                    bin_ins[m] = imm_bits[m]
+                for n, o in zip(range(7,12), range(20,25)):
+                    bin_ins[o] = imm_bits[n]
+                #Asignacion de rs2
+                rs2 = object.rs2[2:]
+                while len(rs2) != 5 and len(rs2) < 6:
+                    rs2 = "0" + rs2
+                rs2_bits = list(rs2)
+                for i, j in zip(range(7,12), range(0,5)):
+                    bin_ins[i] = rs2_bits[j]
+                #Asignacion de rs1
+                rs1 = object.rs1[2:]
+                while len(rs1) != 5 and len(rs1) < 6:
+                    rs1 = "0" + rs1
+                rs1_bits = list(rs1)
+                for i, j in zip(range(12,17), range(0,5)):
+                    bin_ins[i] = rs1_bits[j]   
+                #Asignacion de Func3
+                func3 = bin(object.func3)[2:]
+                while len(func3) != 3 and len(func3) < 4:
+                    func3 = "0" + func3
+                func3_bits = list(func3)
+                for i, j in zip(range(17,20), range(0,3)):
+                    bin_ins[i] = func3_bits[j]
+                #Creacion de variables finales conviertiendo los valores
+                instruction_bin = int("".join(bin_ins), 2)
+                instruction = f"\t{object.mem}\t{instruction_bin:X}\n"
+                file.write(instruction)
+            #Decodificación si es tipo R
+            elif type(object) == InstructionR:
+                bin_ins = [0]*32
+                #Asignacion del func7
+                func7 = object.func7[2:]
+                while len(func7) != 7 and len(func7) < 8:
+                    func7 = "0" + func7
+                func7_bits = list(func7)
+                for i in range(0,7):
+                    bin_ins[i] = func7_bits[i]
+                #Asignacion del rs2
+                rs2 = object.rs2[2:]
+                while len(rs2) != 5 and len(rs2) < 6:
+                    rs2 = "0" + rs2
+                rs2_bits = list(rs2)
+                for i, j in zip(range(0,6),range(7,12)):
+                    bin_ins[j] = rs2_bits[i]
+                #Asignacion del rs1
+                rs1 = object.rs1[2:]
+                while len(rs1) != 5 and len(rs1) < 6:
+                    rs1 = "0" + rs1
+                rs1_bits = list(rs1)
+                for i, j in zip(range(0,6),range(12,17)):
+                    bin_ins[j] = rs1_bits[i]  
+                #Asignacion del func3
+                func3 = object.func3[2:]
+                while len(func3) != 3 and len(func3) < 4:
+                    func3 = "0" + func3
+                func3_bits = list(func3)
+                for i, j in zip(range(0,3), range(17,20)):
+                    bin_ins[j] = func3_bits[i]
+                #Asignacion del rd
+                rd = object.rd[2:]
+                while len(rd) != 5 and len(rd) < 6:
+                    rd = "0" + rd
+                rd_bits = list(rd)
+                for i, j in zip(range(0,6), range(20,25)):
+                    bin_ins[j] = rd_bits[i]
+                #Asignacion opcode
+                opcode = bin(object.opcode)[2:]
+                while len(opcode) != 7 and len(opcode) < 8:
+                    opcode = "0" + opcode
+                opcode_bits = list(opcode)
+                for i, j in zip(range(0,7), range(25,32)):
+                    bin_ins[j] = opcode_bits[i]
+                #Variables finales
+                instruction_bin = int("".join(bin_ins), 2)
+                instruction = f"\t{object.mem}\t{instruction_bin:X}\n"
+                file.write(instruction)
+            #Instrucciones tipo I
+            elif type(object) == InstructionI:
+                bin_ins = [0]*32
+                #Asignación del imm
+                imm = object.imm
+                if imm.startswith("-"):
+                    imm = imm[3:]
+                    while len(imm) != 12 and len(imm) < 13:
+                        imm = "0" + imm
+                    imm = "-" + imm
+                else:
+                    imm = imm[2:]
+                    while len(imm) != 12 and len(imm) < 13:
+                        imm = "0" + imm
+                imm_bits = list(imm)
+                for i in range(0,12):
+                    bin_ins[i] = imm_bits[i]
+                #Asignacion del rs1
+                rs1 = object.rs1[2:]
+                while len(rs1) != 5 and len(rs1) < 6:
+                    rs1 = "0" + rs1
+                rs1_bits = list(rs1)
+                for i, j in zip(range(0,5), range(12, 17)):
+                    bin_ins[j] = rs1_bits[i]
+                #Asignación de func3
+                func3 = object.func3[2:]
+                while len(func3) != 3 and len(func3) < 4:
+                    func3 = "0" + func3
+                func3_bits = list(func3)
+                for i, j in zip(range(0,3), range(17,20)):
+                    bin_ins[j] = func3_bits[i]
+                #Asignación de rd
+                rd = object.rd[2:]
+                while len(rd) != 5 and len(rd) < 6:
+                    rd = "0" + rd
+                rd_bits = list(rd)
+                for i, j in zip(range(0,5), range(20,25)):
+                    bin_ins[j] = rd_bits[i]
+                #Asignación de opcode
+                opcode = bin(object.opcode)[2:]
+                while len(opcode) != 7 and len(opcode) < 8:
+                    opcode = "0" + opcode
+                opcode_bits = list(opcode)
+                for i, j in zip(range(0,7), range(25,32)):
+                    bin_ins[j] = opcode_bits[i]
+                #Variables finales
+                instruction_bin = int("".join(bin_ins), 2)
+                instruction = f"\t{object.mem}\t{instruction_bin:X}\n"
+                file.write(instruction)
+            elif type(object) == InstructionS:
+                bin_ins = [0]*32
+                #Asignación del opcode
+                opcode = bin(object.opcode)[2:]
                 while len(opcode) != 7:
                     opcode = "0" + opcode  
                 opcode_bits = list(opcode)
                 for i, j in zip(range(0,7), range(25,32)):
                     bin_ins[j] = opcode_bits[i]
                 #Asignacion del inmediato
-                imm = object.imm[2:]
-                while len(imm) != 12:
-                    imm = "0" + imm
+                imm = object.imm
+                if imm.startswith("-"):
+                    imm = imm[3:]
+                    while len(imm) != 12 and len(imm) < 13:
+                        imm = "0" + imm
+                    imm = "-" + imm
+                else:
+                    imm = imm[2:]
+                    while len(imm) != 12 and len(imm) < 13:
+                        imm = "0" + imm
                 imm_bits = list(imm)
                 for m in range(0,7):
                     bin_ins[m] = imm_bits[m]
-                bin_ins[24] = imm_bits[11]
                 for n, o in zip(range(7,12), range(20,25)):
                     bin_ins[o] = imm_bits[n]
                 #Asignacion de rs2
@@ -271,63 +425,70 @@ def analyzer(assembler_code):
                     bin_ins[i] = func3_bits[j]
                 #Creacion de variables finales conviertiendo los valores
                 instruction_bin = int("".join(bin_ins), 2)
-                instruction = f"{object.mem}\t{instruction_bin:X}\n"
+                instruction = f"\t{object.mem}\t{instruction_bin:X}\n"
                 file.write(instruction)
-            #Decodificación si es tipo R
-            elif type(object) == InstructionR:
+            elif type(object) == InstructionU:
                 bin_ins = [0]*32
-                #Asignacion del func7
-                func7 = object.func7[2:]
-                while len(func7) != 7:
-                    func7 = "0" + func7
-                func7_bits = list(func7)
-                for i in range(0,7):
-                    bin_ins[i] = func7_bits[i]
-                #Asignacion del rs2
-                rs2 = object.rs2[2:]
-                while len(rs2) != 5:
-                    rs2 = "0" + rs2
-                rs2_bits = list(rs2)
-                for i, j in zip(range(0,6),range(7,12)):
-                    bin_ins[j] = rs2_bits[i]
-                #Asignacion del rs1
-                rs1 = object.rs1[2:]
-                while len(rs1) != 5:
-                    rs1 = "0" + rs1
-                rs1_bits = list(rs1)
-                for i, j in zip(range(0,6),range(12,17)):
-                    bin_ins[j] = rs1_bits[i]  
-                #Asignacion del func3
-                func3 = object.func3[2:]
-                while len(func3) != 3:
-                    func3 = "0" + func3
-                func3_bits = list(func3)
-                for i, j in zip(range(0,3), range(17,20)):
-                    bin_ins[j] = func3_bits[i]
-                #Asignacion del rd
+                #Asignación del imm
+                imm = object.imm[2:]
+                while len(imm) != 20:
+                    imm = "0" + imm
+                imm_bits = list(imm)
+                for i in range(0,20):
+                    bin_ins[i] = imm_bits[i]
+                #Asignación de rd
                 rd = object.rd[2:]
                 while len(rd) != 5:
                     rd = "0" + rd
                 rd_bits = list(rd)
-                for i, j in zip(range(0,6), range(20,25)):
+                for i, j in zip(range(0,5), range(20,25)):
                     bin_ins[j] = rd_bits[i]
-                #Asignacion opcode
+                #Asignación del opcode
                 opcode = bin(object.opcode)[2:]
                 while len(opcode) != 7:
-                    opcode = "0" + opcode
+                    opcode = "0" + opcode  
                 opcode_bits = list(opcode)
                 for i, j in zip(range(0,7), range(25,32)):
                     bin_ins[j] = opcode_bits[i]
-                #Variables finales
+                #Creacion de variables finales conviertiendo los valores
                 instruction_bin = int("".join(bin_ins), 2)
-                instruction = f"{object.mem}\t{instruction_bin:X}\n"
+                instruction = f"\t{object.mem}\t{instruction_bin:X}\n"
                 file.write(instruction)
-            #Instrucciones tipo I
-            elif type(object) == InstructionI:
+            elif type(object) == InstructionJ:
                 bin_ins = [0]*32
-                
-
-
+                #Asignación del imm
+                imm = object.imm
+                if imm.startswith("-"):
+                    imm = imm[3:]
+                    while len(imm) != 12 and len(imm) < 13:
+                        imm = "0" + imm
+                    imm = "-" + imm
+                else:
+                    imm = imm[2:]
+                    while len(imm) != 12 and len(imm) < 13:
+                        imm = "0" + imm
+                imm_bits = list(imm)
+                for i in range(0,20):
+                    bin_ins[i] = imm_bits[i]
+                #Asignación de rd
+                rd = object.rd[2:]
+                while len(rd) != 5:
+                    rd = "0" + rd
+                rd_bits = list(rd)
+                for i, j in zip(range(0,5), range(20,25)):
+                    bin_ins[j] = rd_bits[i]
+                #Asignación del opcode
+                opcode = bin(object.opcode)[2:]
+                while len(opcode) != 7:
+                    opcode = "0" + opcode  
+                opcode_bits = list(opcode)
+                for i, j in zip(range(0,7), range(25,32)):
+                    bin_ins[j] = opcode_bits[i]
+                #Creacion de variables finales conviertiendo los valores
+                instruction_bin = int("".join(bin_ins), 2)
+                instruction = f"\t{object.mem}\t{instruction_bin:X}\n"
+                file.write(instruction)
+            
     print(Program)
 
 
