@@ -183,7 +183,7 @@ def pseudo_translate(assembler_code):
                     memory += 4
                 #Verifica si es tipo J
                 elif inst_name in j_list:
-                    param_patt = r'(\w+)(\s*\,\s*)(\d+)(\s*)($)'
+                    param_patt = r'(\w+)(\s*\,\s*)(\-?\d+)(\s*)($)'
                     params = re.match(param_patt, inst_details)
                     for i in range(32):
                         if params.group(1) in regs[i]:
@@ -197,7 +197,7 @@ def pseudo_translate(assembler_code):
                     memory += 4
                 #Verifica si es tipo B
                 elif inst_name in b_list:
-                    param_patt = r'(\w+)(\s*\,\s*)(\w+)(\s*\,\s*)(\d+)($)'
+                    param_patt = r'(\w+)(\s*\,\s*)(\w+)(\s*\,\s*)(\-?\d+)($)'
                     params = re.match(param_patt, inst_details)
                     for i in range(32):
                         if params.group(1) in regs[i]:
@@ -218,11 +218,11 @@ def pseudo_translate(assembler_code):
 ##'''
 def analyzer(assembler_code):
     pseudo_translate(assembler_code)
-    if open("binary_out.txt", "w"):
-        file = open("binary_out.txt", "w")
+    if open("binary_out.hex", "w"):
+        file = open("binary_out.hex", "w")
     else: 
-        open("binary_out", "x")
-        file = open("binary_out.txt", "w")
+        open("binary_out.hex", "x")
+        file = open("binary_out.hex", "w")
 
     for element in Labels:
         label_line = f"{element.mem:X} <{element.name}>\n"
@@ -244,16 +244,20 @@ def analyzer(assembler_code):
                     imm = imm[3:]
                     while len(imm) != 12 and len(imm) < 13:
                         imm = "0" + imm
-                    imm = "-" + imm
+                    imm = ''.join('1' if bit == '0' else '0' for bit in imm)
+                    imm = bin(int(imm,2)+1)[2:]
+                    bin_ins[0] = "1"
                 else:
                     imm = imm[2:]
                     while len(imm) != 12 and len(imm) < 13:
                         imm = "0" + imm
+                    bin_ins[0] = "0"
                 imm_bits = list(imm)
-                for m in range(0,7):
-                    bin_ins[m] = imm_bits[m]
-                for n, o in zip(range(7,12), range(20,25)):
-                    bin_ins[o] = imm_bits[n]
+                for i, j in zip(range(1,7), range(1,7)):
+                    bin_ins[i] = imm_bits[j]
+                bin_ins[24] = imm_bits[0]
+                for i, j in zip(range(20,24), range(7,11)):
+                    bin_ins[i] = imm_bits[j]
                 #Asignacion de rs2
                 rs2 = object.rs2[2:]
                 while len(rs2) != 5 and len(rs2) < 6:
@@ -276,9 +280,20 @@ def analyzer(assembler_code):
                 for i, j in zip(range(17,20), range(0,3)):
                     bin_ins[i] = func3_bits[j]
                 #Creacion de variables finales conviertiendo los valores
-                instruction_bin = int("".join(bin_ins), 2)
-                instruction = f"\t{object.mem}\t{instruction_bin:X}\n"
+                instruction_hex = hex(int("".join(bin_ins), 2))[2:]
+                while len(instruction_hex) < 8:
+                    instruction_hex = "0"+instruction_hex
+                instruction_bin = bin(int("".join(bin_ins), 2))[2:]
+                while len(instruction_bin) < 32:
+                    instruction_bin = "0"+instruction_bin
+                fillMem = ''
+                if len(object.mem[2:]) <= 5:
+                    iters = 5 - len(object.mem[2:])
+                    for i in range(iters):
+                        fillMem = "0" + fillMem
+                instruction = f"\t{fillMem}{object.mem}\t\t{instruction_hex}\t\t{instruction_bin}\n"
                 file.write(instruction)
+            
             #Decodificación si es tipo R
             elif type(object) == InstructionR:
                 bin_ins = [0]*32
@@ -325,9 +340,20 @@ def analyzer(assembler_code):
                 for i, j in zip(range(0,7), range(25,32)):
                     bin_ins[j] = opcode_bits[i]
                 #Variables finales
-                instruction_bin = int("".join(bin_ins), 2)
-                instruction = f"\t{object.mem}\t{instruction_bin:X}\n"
+                instruction_hex = hex(int("".join(bin_ins), 2))[2:]
+                while len(instruction_hex) < 8:
+                    instruction_hex = "0"+instruction_hex
+                instruction_bin = bin(int("".join(bin_ins), 2))[2:]
+                while len(instruction_bin) < 32:
+                    instruction_bin = "0"+instruction_bin
+                fillMem = ''
+                if len(object.mem[2:]) <= 5:
+                    iters = 5 - len(object.mem[2:])
+                    for i in range(iters):
+                        fillMem = "0" + fillMem
+                instruction = f"\t{fillMem}{object.mem}\t\t{instruction_hex}\t\t{instruction_bin}\n"
                 file.write(instruction)
+            
             #Instrucciones tipo I
             elif type(object) == InstructionI:
                 bin_ins = [0]*32
@@ -337,7 +363,8 @@ def analyzer(assembler_code):
                     imm = imm[3:]
                     while len(imm) != 12 and len(imm) < 13:
                         imm = "0" + imm
-                    imm = "-" + imm
+                    imm = ''.join('1' if bit == '0' else '0' for bit in imm)
+                    imm = bin(int(imm,2)+1)[2:] 
                 else:
                     imm = imm[2:]
                     while len(imm) != 12 and len(imm) < 13:
@@ -374,8 +401,18 @@ def analyzer(assembler_code):
                 for i, j in zip(range(0,7), range(25,32)):
                     bin_ins[j] = opcode_bits[i]
                 #Variables finales
-                instruction_bin = int("".join(bin_ins), 2)
-                instruction = f"\t{object.mem}\t{instruction_bin:X}\n"
+                instruction_hex = hex(int("".join(bin_ins), 2))[2:]
+                while len(instruction_hex) < 8:
+                    instruction_hex = "0"+instruction_hex
+                instruction_bin = bin(int("".join(bin_ins), 2))[2:]
+                while len(instruction_bin) < 32:
+                    instruction_bin = "0"+instruction_bin
+                fillMem = ''
+                if len(object.mem[2:]) <= 5:
+                    iters = 5 - len(object.mem[2:])
+                    for i in range(iters):
+                        fillMem = "0" + fillMem
+                instruction = f"\t{fillMem}{object.mem}\t\t{instruction_hex}\t\t{instruction_bin}\n"
                 file.write(instruction)
             elif type(object) == InstructionS:
                 bin_ins = [0]*32
@@ -392,7 +429,8 @@ def analyzer(assembler_code):
                     imm = imm[3:]
                     while len(imm) != 12 and len(imm) < 13:
                         imm = "0" + imm
-                    imm = "-" + imm
+                    imm = ''.join('1' if bit == '0' else '0' for bit in imm)
+                    imm = bin(int(imm,2)+1)[2:] 
                 else:
                     imm = imm[2:]
                     while len(imm) != 12 and len(imm) < 13:
@@ -424,13 +462,27 @@ def analyzer(assembler_code):
                 for i, j in zip(range(17,20), range(0,3)):
                     bin_ins[i] = func3_bits[j]
                 #Creacion de variables finales conviertiendo los valores
-                instruction_bin = int("".join(bin_ins), 2)
-                instruction = f"\t{object.mem}\t{instruction_bin:X}\n"
+                instruction_hex = hex(int("".join(bin_ins), 2))[2:]
+                while len(instruction_hex) < 8:
+                    instruction_hex = "0"+instruction_hex
+                instruction_bin = bin(int("".join(bin_ins), 2))[2:]
+                while len(instruction_bin) < 32:
+                    instruction_bin = "0"+instruction_bin
+                fillMem = ''
+                if len(object.mem[2:]) <= 5:
+                    iters = 5 - len(object.mem[2:])
+                    for i in range(iters):
+                        fillMem = "0" + fillMem
+                instruction = f"\t{fillMem}{object.mem}\t\t{instruction_hex}\t\t{instruction_bin}\n"
                 file.write(instruction)
             elif type(object) == InstructionU:
                 bin_ins = [0]*32
                 #Asignación del imm
-                imm = object.imm[2:]
+                imm = object.imm
+                if imm.startswith("-"):
+                    raise ValueError
+                else:
+                    imm = imm[2:]
                 while len(imm) != 20:
                     imm = "0" + imm
                 imm_bits = list(imm)
@@ -451,25 +503,42 @@ def analyzer(assembler_code):
                 for i, j in zip(range(0,7), range(25,32)):
                     bin_ins[j] = opcode_bits[i]
                 #Creacion de variables finales conviertiendo los valores
-                instruction_bin = int("".join(bin_ins), 2)
-                instruction = f"\t{object.mem}\t{instruction_bin:X}\n"
+                instruction_hex = hex(int("".join(bin_ins), 2))[2:]
+                while len(instruction_hex) < 8:
+                    instruction_hex = "0"+instruction_hex
+                instruction_bin = bin(int("".join(bin_ins), 2))[2:]
+                while len(instruction_bin) < 32:
+                    instruction_bin = "0"+instruction_bin
+                fillMem = ''
+                if len(object.mem[2:]) <= 5:
+                    iters = 5 - len(object.mem[2:])
+                    for i in range(iters):
+                        fillMem = "0" + fillMem
+                instruction = f"\t{fillMem}{object.mem}\t\t{instruction_hex}\t\t{instruction_bin}\n"
                 file.write(instruction)
+            #Instrucciones tipo J
             elif type(object) == InstructionJ:
                 bin_ins = [0]*32
                 #Asignación del imm
                 imm = object.imm
                 if imm.startswith("-"):
                     imm = imm[3:]
-                    while len(imm) != 12 and len(imm) < 13:
+                    while len(imm) != 20 and len(imm) < 21:
                         imm = "0" + imm
-                    imm = "-" + imm
+                    imm = ''.join('1' if bit == '0' else '0' for bit in imm)
+                    imm = bin(int(imm,2)+1)[2:]
+                    bin_ins[0] = "1"
                 else:
                     imm = imm[2:]
-                    while len(imm) != 12 and len(imm) < 13:
+                    while len(imm) != 20 and len(imm) < 21:
                         imm = "0" + imm
+                    bin_ins[0] = "0"
                 imm_bits = list(imm)
-                for i in range(0,20):
-                    bin_ins[i] = imm_bits[i]
+                for i, j in zip(range(1,11), range(9,19)):
+                    bin_ins[i] = imm_bits[j]
+                bin_ins[11] = imm_bits[8]
+                for i, j in zip(range(0,8), range(12,20)):
+                    bin_ins[j] = imm_bits[i]
                 #Asignación de rd
                 rd = object.rd[2:]
                 while len(rd) != 5:
@@ -485,12 +554,19 @@ def analyzer(assembler_code):
                 for i, j in zip(range(0,7), range(25,32)):
                     bin_ins[j] = opcode_bits[i]
                 #Creacion de variables finales conviertiendo los valores
-                instruction_bin = int("".join(bin_ins), 2)
-                instruction = f"\t{object.mem}\t{instruction_bin:X}\n"
+                instruction_hex = hex(int("".join(bin_ins), 2))[2:]
+                while len(instruction_hex) < 8:
+                    instruction_hex = "0"+instruction_hex
+                instruction_bin = bin(int("".join(bin_ins), 2))[2:]
+                while len(instruction_bin) < 32:
+                    instruction_bin = "0"+instruction_bin
+                fillMem = ''
+                if len(object.mem[2:]) <= 5:
+                    iters = 5 - len(object.mem[2:])
+                    for i in range(iters):
+                        fillMem = "0" + fillMem
+                instruction = f"\t{fillMem}{object.mem}\t\t{instruction_hex}\t\t{instruction_bin}\n"
                 file.write(instruction)
-            
-    print(Program)
-
 
 #Función para ejecutar el programa desde consola
 if __name__ == "__main__":
