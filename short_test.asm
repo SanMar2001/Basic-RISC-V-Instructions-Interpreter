@@ -1,23 +1,3 @@
-type_U:
-    lui x4, 12
-    auipc x6, 15
-
-type_J:
-    jal x7, -73
-    jal x6, 542
-
-type_R:
-    add x14, x6, x17
-    and x4, x16, x7
-    or x3, x6, x7
-    sll x14, x6, x7
-    slt x7, x6, x7
-    sltu x4, x6, x8
-    sra x3, x8, x7
-    srl x1, x9, x6
-    sub x3, x10, x7
-    xor x4, x6, x1
-
 type_I:
     addi x4, x6, -59
     addi x4, x6, 123
