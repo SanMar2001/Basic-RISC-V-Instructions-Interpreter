@@ -1,5 +1,8 @@
 def rd_loader(rd):
-    pass
+    while len(rd) != 5 and len(rd) < 6:
+        rd = "0" + rd
+    rd_bits = list(rd)
+    return rd_bits
 
 def rs1_loader(rs1):
     while len(rs1) != 5 and len(rs1) < 6:
@@ -79,9 +82,7 @@ def rectificate():
 
 def writingFiles(file, core, instruction, hex, intMem):
     file.write(instruction)
-    print(hex)
     if (intMem%16 == 0) and (intMem != 0):
         core.write("\n")
     hex_chain = f"{hex[0]}{hex[1]}  {hex[2]}{hex[3]}  {hex[4]}{hex[5]}  {hex[6]}{hex[7]}  "
-    print(hex_chain)
     core.write(hex_chain)

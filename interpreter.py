@@ -63,10 +63,7 @@ def analyzer(assembler_code):
                 for i, j in zip(range(0,3), range(17,20)):
                     bin_ins[j] = func3_bits[i]
                 #Asignacion del rd
-                rd = object.rd[2:]
-                while len(rd) != 5 and len(rd) < 6:
-                    rd = "0" + rd
-                rd_bits = list(rd)
+                rd_bits = rd_loader(object.rd[2:])
                 for i, j in zip(range(0,6), range(20,25)):
                     bin_ins[j] = rd_bits[i]
                 #Asignacion opcode
@@ -93,10 +90,7 @@ def analyzer(assembler_code):
                 for i, j in zip(range(0,3), range(17,20)):
                     bin_ins[j] = func3_bits[i]
                 #Asignación de rd
-                rd = object.rd[2:]
-                while len(rd) != 5 and len(rd) < 6:
-                    rd = "0" + rd
-                rd_bits = list(rd)
+                rd_bits = rd_loader(object.rd[2:])
                 for i, j in zip(range(0,5), range(20,25)):
                     bin_ins[j] = rd_bits[i]
                 #Asignación de opcode
@@ -144,10 +138,7 @@ def analyzer(assembler_code):
                 for i in range(0,20):
                     bin_ins[i] = imm_bits[i]
                 #Asignación de rd
-                rd = object.rd[2:]
-                while len(rd) != 5:
-                    rd = "0" + rd
-                rd_bits = list(rd)
+                rd_bits = rd_loader(object.rd[2:])
                 for i, j in zip(range(0,5), range(20,25)):
                     bin_ins[j] = rd_bits[i]
                 #Asignación del opcode
@@ -169,10 +160,7 @@ def analyzer(assembler_code):
                 for i, j in zip(range(0,8), range(12,20)):
                     bin_ins[j] = imm_bits[i]
                 #Asignación de rd
-                rd = object.rd[2:]
-                while len(rd) != 5:
-                    rd = "0" + rd
-                rd_bits = list(rd)
+                rd_bits = rd_loader(object.rd[2:])
                 for i, j in zip(range(0,5), range(20,25)):
                     bin_ins[j] = rd_bits[i]
                 #Asignación del opcode

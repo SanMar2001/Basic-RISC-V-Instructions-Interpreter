@@ -69,11 +69,12 @@ def pseudo_translate(assembler_code):
                 rd_jr = re.match(jr_rdPatt, jr_rd)
                 for i in range(32):
                     if rd_jr.group(1) in regs[i]:
-                        pos_rd = i
+                        pos_rs1 = i
                         break
                 if len(Labels) > 0:
-                    new_ins = f"jalr x0,x{pos_rd}\n"
-                    obj_ins = InstructionI("jalr", pos_rd, 0, 0, memory)
+                    new_ins = f"jalr x0,x{pos_rs1}\n"
+                    print(pos_rs1)
+                    obj_ins = InstructionI("jalr", 0, pos_rs1, 0, memory)
                     Program.append((new_ins, memory))
                     Labels[len(Labels)-1].instructions.append(obj_ins)
                     memory += 4
