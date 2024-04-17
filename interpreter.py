@@ -6,7 +6,7 @@ from funcs import *
 
 
 def analyzer(assembler_code):
-    pseudo_translate(assembler_code)
+    memory = pseudo_translate(assembler_code)
     file, core = rectificate()
     for element in Labels:
         label_line = f"{element.mem:X} <{element.name}>\n"
@@ -171,6 +171,7 @@ def analyzer(assembler_code):
                 instruction_hex, instruction_bin, finalMem, intMem = formater(bin_ins, object)
                 instruction = f"\t{intMem}\t\t\t{finalMem}\t\t{instruction_hex}\t\t{instruction_bin}\n"
                 writingFiles(file, core, instruction, instruction_hex, intMem)
+    return memory, core
 
 #Función para ejecutar el programa desde consola
 if __name__ == "__main__":
@@ -178,5 +179,6 @@ if __name__ == "__main__":
         print("Correct use: python interpreter.py assembler_code.asm")
     else:
         assembler_code = sys.argv[1]
-        analyzer(assembler_code)
+        memory, core = analyzer(assembler_code)
+        fuller(memory, core)
 ##'''

@@ -213,3 +213,4 @@ def pseudo_translate(assembler_code):
                     Program.append((new_ins, memory))
                     Labels[len(Labels)-1].instructions.append(obj_ins)
                     memory += 4
+    return memory
