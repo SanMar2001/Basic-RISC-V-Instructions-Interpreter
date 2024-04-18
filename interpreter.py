@@ -8,6 +8,7 @@ from funcs import *
 def analyzer(assembler_code):
     memory = pseudo_translate(assembler_code)
     file, core = rectificate()
+    core.write("v2.0 raw\n")
     for element in Labels:
         label_line = f"{element.mem:X} <{element.name}>\n"
         file.write(label_line)
