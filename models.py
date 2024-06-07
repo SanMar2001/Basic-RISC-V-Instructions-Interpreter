@@ -89,7 +89,7 @@ class InstructionB:
             self.func3 = self.ins_0[self.name]
         self.rs1 = bin(rs1)
         self.rs2 = bin(rs2)
-        self.imm = bin(imm)
+        self.imm = imm
         self.mem = hex(mem)
 
 class InstructionU:

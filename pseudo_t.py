@@ -91,7 +91,7 @@ def pseudo_translate(assembler_code):
                 inst_details = inst.group(4)
                 #Verifica si es tipo R
                 if inst_name in r_list:
-                    param_patt = r'(\w+)(\s*)(\,)(\s*)(\w+)(\s*)(\,)(\s*)(\w+)($)'
+                    param_patt = r'(\w+)(\s*)(\,)(\s*)(\w+)(\s*)(\,)(\s*)(\w+)(\s*)($)'
                     params = re.match(param_patt, inst_details)
                     for i in range(32):
                         if params.group(1) in regs[i]:
@@ -113,7 +113,7 @@ def pseudo_translate(assembler_code):
                         memory += 4
                 #Verifica si es tipo I de la forma rd, rs1, imm
                 elif inst_name in i_list[0]:
-                    param_patt = r'(\w+)(\s*\,\s*)(\w+)(\s*\,\s*)(\-?\d+)($)'
+                    param_patt = r'(\w+)(\s*\,\s*)(\w+)(\s*\,\s*)(\-?\d+)(\s*)($)'
                     params = re.match(param_patt, inst_details)
                     for i in range(32):
                         if params.group(1) in regs[i]:
@@ -132,7 +132,7 @@ def pseudo_translate(assembler_code):
                         memory += 4
                 #Verifica si es tipo I de la forma rd,imm(rs1)
                 elif inst_name in i_list[1]:
-                    param_patt = r'(\w+)(\s*\,\s*)(\-?\d+)(\s*\(\s*)(\w+)(\s*\))($)'
+                    param_patt = r'(\w+)(\s*\,\s*)(\-?\d+)(\s*\(\s*)(\w+)(\s*\))(\s*)($)'
                     params = re.match(param_patt, inst_details)
                     for i in range(32):
                         if params.group(1) in regs[i]:
@@ -150,7 +150,7 @@ def pseudo_translate(assembler_code):
                     memory += 4
                 #Verifica si es tipo S
                 elif inst_name in s_list:
-                    param_patt = r'(\w+)(\s*\,\s*)(\-?\d+)(\s*\(\s*)(\w+)(\s*\))($)'
+                    param_patt = r'(\w+)(\s*\,\s*)(\-?\d+)(\s*\(\s*)(\w+)(\s*\))(\s*)($)'
                     params = re.match(param_patt, inst_details)
                     for i in range(32):
                         if params.group(1) in regs[i]:
@@ -197,16 +197,29 @@ def pseudo_translate(assembler_code):
                 #Verifica si es tipo B
                 elif inst_name in b_list:
                     param_patt = r'(\w+)(\s*\,\s*)(\w+)(\s*\,\s*)(\-?\d+)($)'
-                    params = re.match(param_patt, inst_details)
-                    for i in range(32):
-                        if params.group(1) in regs[i]:
-                            rs1_inst = i
-                            break
-                    for j in range(32):
-                        if params.group(3) in regs[j]:
-                            rs2_inst = j
-                            break
-                    imm_inst = int(params.group(5))
+                    param_patt2 = r'(\w+)(\s*\,\s*)(\w+)(\s*\,\s*)(\D+\w*)($)'
+                    if re.match(param_patt, inst_details):
+                        params = re.match(param_patt, inst_details)
+                        for i in range(32):
+                            if params.group(1) in regs[i]:
+                                rs1_inst = i
+                                break
+                        for j in range(32):
+                            if params.group(3) in regs[j]:
+                                rs2_inst = j
+                                break
+                        imm_inst = int(params.group(5))
+                    elif re.match(param_patt2, inst_details):
+                        params = re.match(param_patt2, inst_details)
+                        for i in range(32):
+                            if params.group(1) in regs[i]:
+                                rs1_inst = i
+                                break
+                        for j in range(32):
+                            if params.group(3) in regs[j]:
+                                rs2_inst = j
+                                break
+                        imm_inst = str(params.group(5))
                     new_ins = f"{inst_name} {rs1_inst},{rs2_inst},{imm_inst}\n"
                     obj_ins = InstructionB(inst_name, rs1_inst, rs2_inst, imm_inst, memory)
                     Program.append((new_ins, memory))

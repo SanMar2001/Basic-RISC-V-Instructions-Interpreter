@@ -21,7 +21,12 @@ def analyzer(assembler_code):
                 for i, j in zip(range(0,7), range(25,32)):
                     bin_ins[j] = opcode_bits[i]
                 #Asignacion del inmediato
-                imm_bits, bin_ins[0] = imm_loader(object.imm, 12)
+                if isinstance(object.imm, str):
+                    for item in Labels:
+                        if item.name == object.imm:
+                            imm_bits, bin_ins[0] = imm_loader(bin(item.mem), 12)
+                elif isinstance(object.imm, int):
+                    imm_bits, bin_ins[0] = imm_loader(bin(object.imm), 12)
                 for i, j in zip(range(1,7), range(1,7)):
                     bin_ins[i] = imm_bits[j]
                 bin_ins[24] = imm_bits[0]
